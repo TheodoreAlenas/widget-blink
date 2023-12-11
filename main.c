@@ -4,10 +4,6 @@
 #include <unistd.h>
 
 #include <locale.h>
-
-#include <X11/Xlib.h>
-#include <X11/Xatom.h>
-#include <X11/Xutil.h>
 #include <X11/Xft/Xft.h>
 
 static void die(const char *fmt, ...) {
