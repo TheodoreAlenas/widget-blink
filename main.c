@@ -49,7 +49,8 @@ int main(int argc, char *argv[]) {
 	Drawable drawable;
 	GC gc;
 	XftFont *xfont;
-	XftColor xcolor;
+	XftColor fg, bg;
+	XftDraw *d = NULL;
 	XSetWindowAttributes swa;
 	XClassHint ch = {"dmenu", "dmenu"};
 	for (int i = 1; i < argc; i++) {
@@ -84,10 +85,21 @@ int main(int argc, char *argv[]) {
 		die("error, cannot load monospace font\n");
 	if (!XftColorAllocName(dpy, DefaultVisual(dpy, screen),
 	                       DefaultColormap(dpy, screen),
-	                       "#aaffaa", &xcolor))
-		die("error, cannot allocate color");
+	                       "#aaffaa", &bg))
+		die("error, cannot allocate background color");
+	if (!XftColorAllocName(dpy, DefaultVisual(dpy, screen),
+	                       DefaultColormap(dpy, screen),
+	                       "#550000", &fg))
+		die("error, cannot allocate foreground color");
+	XSetForeground(dpy, gc, bg.pixel);
+	XFillRectangle(dpy, drawable, gc, 0, 0, w, h);
+	d = XftDrawCreate(dpy, drawable,
+					  DefaultVisual(dpy, screen),
+					  DefaultColormap(dpy, screen));
+	XftDrawStringUtf8(d, &fg,
+					  xfont, 0, 100, (XftChar8 *)"shit", 5);
 	swa.override_redirect = True;
-	swa.background_pixel = xcolor.pixel;
+	swa.background_pixel = bg.pixel;
 	swa.event_mask = ExposureMask | KeyPressMask | VisibilityChangeMask;
 	win = XCreateWindow(dpy, root, 0, 0, w, h, 0,
 	                    CopyFromParent, CopyFromParent, CopyFromParent,
@@ -96,7 +108,7 @@ int main(int argc, char *argv[]) {
 	XMapRaised(dpy, win);
 	XCopyArea(dpy, drawable, win, gc, 0, 0, w, h, 0, 0);
 	XSync(dpy, False);
-	usleep(200000);
+	usleep(500000);
 
 	XftFontClose(dpy, xfont);
 	free(xfont);
