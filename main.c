@@ -43,10 +43,14 @@ static void usage(const char *program_name) {
 int main(int argc, char *argv[]) {
 	int screen, w, h;
 	Display *dpy;
-	Window root;
+	Window root, win;
 	XWindowAttributes wa;
 	Drawable drawable;
 	GC gc;
+	XftFont *xfont;
+	XftColor xcolor;
+	XSetWindowAttributes swa;
+	XClassHint ch = {"dmenu", "dmenu"};
 	for (int i = 1; i < argc; i++) {
 		if (!strcmp(argv[i], "-v")) {
 			puts("albatpop-"VERSION);
@@ -75,5 +79,19 @@ int main(int argc, char *argv[]) {
 	drawable = XCreatePixmap(dpy, root, w, h, DefaultDepth(dpy, screen));
 	gc = XCreateGC(dpy, root, 0, NULL);
 	XSetLineAttributes(dpy, gc, 1, LineSolid, CapButt, JoinMiter);
+	if (!(xfont = XftFontOpenName(dpy, screen, "monospace:size=10")))
+		die("error, cannot load monospace font\n");
+	if (!XftColorAllocName(dpy, DefaultVisual(dpy, screen),
+	                       DefaultColormap(dpy, screen),
+	                       "#aaffaa", &xcolor))
+		die("error, cannot allocate color");
+	swa.override_redirect = True;
+	swa.background_pixel = xcolor.pixel;
+	swa.event_mask = ExposureMask | KeyPressMask | VisibilityChangeMask;
+	win = XCreateWindow(dpy, root, 0, 0, w, h, 0,
+	                    CopyFromParent, CopyFromParent, CopyFromParent,
+	                    CWOverrideRedirect | CWBackPixel | CWEventMask, &swa);
+	XSetClassHint(dpy, win, &ch);
+
 	return 0;
 }
