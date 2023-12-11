@@ -27,6 +27,30 @@ static void die(const char *fmt, ...) {
 	exit(1);
 }
 
+#define BAT_CAPACITY_PATH "/sys/class/power_supply/BAT1/capacity"
+#define BAT_STATUS_PATH "/sys/class/power_supply/BAT1/status"
+
+static void get_stats(char *percentage, int *is_charging) {
+	FILE *f;
+
+	if (!percentage) {
+		if (!(f = fopen(BAT_CAPACITY_PATH, "r"))) {
+			perror("fopen");
+			exit(-1);
+		}
+		fclose(f);
+	}
+	if (is_charging && *is_charging == -1) {
+		if (!(f = fopen(BAT_STATUS_PATH, "r"))) {
+			perror("fopen");
+			exit(-1);
+		}
+		fclose(f);
+	}
+}
+#undef BAT_CAPACITY_PATH
+#undef BAT_STATUS_PATH
+
 void albatwid_draw(const char *text,
 				   const char *fg_color,
 				   const char *bg_color,
@@ -119,6 +143,7 @@ static void usage(const char *program_name) {
 
 int main(int argc, char *argv[]) {
 	char *percentage = "error";
+	int is_charging = -1;
 	double timeout = 0.5;
 
 	for (int i = 1; i < argc; i++) {
@@ -128,6 +153,7 @@ int main(int argc, char *argv[]) {
 		else if (!strcmp(argv[i], "-t")) timeout = atof(argv[++i]);
 		else usage(argv[0]);
 	}
+	get_stats(percentage, &is_charging);
 	albatwid_draw(percentage, "#afbcbf", "#000e17", "#004065", timeout);
 
 	return 0;
