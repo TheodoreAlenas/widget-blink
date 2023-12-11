@@ -94,6 +94,8 @@ int main(int argc, char *argv[]) {
 	                    CWOverrideRedirect | CWBackPixel | CWEventMask, &swa);
 	XSetClassHint(dpy, win, &ch);
 	XMapRaised(dpy, win);
+	XCopyArea(dpy, drawable, win, gc, 0, 0, w, h, 0, 0);
+	XSync(dpy, False);
 	usleep(1000000);
 
 	return 0;
