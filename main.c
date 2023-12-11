@@ -96,7 +96,10 @@ int main(int argc, char *argv[]) {
 	XMapRaised(dpy, win);
 	XCopyArea(dpy, drawable, win, gc, 0, 0, w, h, 0, 0);
 	XSync(dpy, False);
-	usleep(1000000);
+	usleep(200000);
+
+	XftFontClose(dpy, xfont);
+	free(xfont);
 
 	return 0;
 }
