@@ -148,7 +148,7 @@ static void usage(const char *program_name) {
 
 int main(int argc, char *argv[]) {
 	char *percentage = NULL, to_fill[5] = {'\0', '\0', '\0', '\0', '\0'};
-	int is_charging = -1, only_below = 999;
+	int is_charging = -1, only_below = -1;
 	double timeout = 0.5;
 
 	for (int i = 1; i < argc; i++) {
@@ -168,16 +168,15 @@ int main(int argc, char *argv[]) {
 		get_percentage(to_fill);
 		percentage = to_fill;
 	}
-	if (atoi(percentage) > only_below) {
+	if (only_below >= 0 && atoi(percentage) > only_below)
 		exit(0);
-	}
-	if (is_charging == -1) {
+	if (is_charging == -1)
 		is_charging = get_is_charging();
-	}
-	if (is_charging) {
+	if (only_below >= 0 && is_charging)
+		exit(0);
+	if (is_charging)
 		albatwid_draw(percentage, "#379cf6", "#000e17", "#004065", timeout);
-	} else {
+	else
 		albatwid_draw(percentage, "#afbcbf", "#000e17", "#1a202b", timeout);
-	}
 	return 0;
 }
