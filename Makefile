@@ -1,4 +1,4 @@
-VERSION=0.0
+V=1.0
 
 STD_WARNS = -std=c99 -pedantic -Wall
 INCS = -I/usr/X11R6/include -I/usr/include/freetype2
@@ -9,7 +9,7 @@ CFLAGS = $(STD_WARNS) $(INCS) $(CPPFLAGS)
 LDFLAGS = -L/usr/X11R6/lib -lX11 -lfontconfig -lXft
 
 albatwid: main.c
-	$(CC) $(CFLAGS) -o $@ -DVERSION=$V $^ $(LDFLAGS)
+	$(CC) $(CFLAGS) -o $@ -DALBATWID_VERSION=\"$V\" $^ $(LDFLAGS)
 
 test: albatwid
 	! ./albatwid --nonexistent-flag

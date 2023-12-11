@@ -146,7 +146,10 @@ int main(int argc, char *argv[]) {
 	double timeout = 0.5;
 
 	for (int i = 1; i < argc; i++) {
-		if (!strcmp(argv[i], "-v")) {puts("albatpop-"VERSION); exit(0);}
+		if (!strcmp(argv[i], "-v")) {
+			puts("albatpop-"ALBATWID_VERSION);
+			exit(0);
+		}
 		else if (!strcmp(argv[i], "-c")) is_charging = 1;
 		else if (!strcmp(argv[i], "-C")) is_charging = 0;
 		else if (i + 1 == argc) usage(argv[0]);
