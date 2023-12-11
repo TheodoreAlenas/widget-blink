@@ -33,7 +33,7 @@ void albatwid_draw(const char *text,
 				   const char *charged_bg_color,
 				   double timeout_seconds) {
 
-	int screen, w, h, charged;
+	int screen, w, h, charged, charged_percent;
 	Display *dpy;
 	Window root, win;
 	XWindowAttributes wa;
@@ -45,6 +45,8 @@ void albatwid_draw(const char *text,
 	XGlyphInfo ext;
 	XSetWindowAttributes swa;
 	XClassHint ch = {"dmenu", "dmenu"};
+
+	charged_percent = atoi(text);
 
 	if (!setlocale(LC_CTYPE, "") || !XSupportsLocale())
 		fputs("warning: no locale support\n", stderr);
@@ -61,22 +63,22 @@ void albatwid_draw(const char *text,
 	gc = XCreateGC(dpy, root, 0, NULL);
 	XSetLineAttributes(dpy, gc, 1, LineSolid, CapButt, JoinMiter);
 	if (!(xfont = XftFontOpenName(dpy, screen, "Source Code Pro:size=300")))
-		die("error, cannot load monospace font\n");
+		die("cannot load font\n");
 	if (!XftColorAllocName(dpy, DefaultVisual(dpy, screen),
 	                       DefaultColormap(dpy, screen),
 						   bg_color, &bg))
-		die("error, cannot allocate background color");
+		die("cannot allocate background color");
 	if (!XftColorAllocName(dpy, DefaultVisual(dpy, screen),
 	                       DefaultColormap(dpy, screen),
 						   charged_bg_color, &bg_charged))
-		die("error, cannot allocate background color");
+		die("cannot allocate background color");
 	if (!XftColorAllocName(dpy, DefaultVisual(dpy, screen),
 	                       DefaultColormap(dpy, screen),
 	                       fg_color, &fg))
 		die("error, cannot allocate foreground color");
 	XSetForeground(dpy, gc, bg.pixel);
 	XFillRectangle(dpy, drawable, gc, 0, 0, w, h);
-	charged = h * 30 / 100;
+	charged = charged_percent * h / 100;
 	XSetForeground(dpy, gc, bg_charged.pixel);
 	XFillRectangle(dpy, drawable, gc, 0, h - charged, w, charged);
 	d = XftDrawCreate(dpy, drawable,
@@ -85,7 +87,7 @@ void albatwid_draw(const char *text,
 	XftTextExtentsUtf8(dpy, xfont, (XftChar8 *)text, strlen(text), &ext);
 	XftDrawStringUtf8(d, &fg, xfont,
 					  (w - ext.xOff) / 2,
-					  (h + xfont->ascent + xfont->descent) * 4/10,  /* fiddly */
+					  (h + xfont->ascent + xfont->descent) * 4/10,
 					  (XftChar8 *)text, strlen(text));
 	swa.override_redirect = True;
 	swa.background_pixel = bg.pixel;
@@ -97,6 +99,7 @@ void albatwid_draw(const char *text,
 	XMapRaised(dpy, win);
 	XCopyArea(dpy, drawable, win, gc, 0, 0, w, h, 0, 0);
 	XSync(dpy, False);
+
 	usleep(1000000L * timeout_seconds);
 
 	XftFontClose(dpy, xfont);
@@ -115,7 +118,7 @@ static void usage(const char *program_name) {
 }
 
 int main(int argc, char *argv[]) {
-	char *percentage = "69";
+	char *percentage = "error";
 	double timeout = 0.5;
 
 	for (int i = 1; i < argc; i++) {
