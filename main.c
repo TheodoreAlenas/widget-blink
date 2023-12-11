@@ -27,13 +27,10 @@ static void die(const char *fmt, ...) {
 	exit(1);
 }
 
-#define BAT_CAPACITY_PATH "/sys/class/power_supply/BAT1/capacity"
-#define BAT_STATUS_PATH "/sys/class/power_supply/BAT1/status"
-
 static void get_percentage(char *percentage) {
 	FILE *f;
 
-	if (!(f = fopen(BAT_CAPACITY_PATH, "r"))) {
+	if (!(f = fopen("/sys/class/power_supply/BAT1/capacity", "r"))) {
 		perror("fopen");
 		exit(-1);
 	}
@@ -43,8 +40,18 @@ static void get_percentage(char *percentage) {
 		if (*percentage == '\n')
 			*percentage = '\0';
 }
-#undef BAT_CAPACITY_PATH
-#undef BAT_STATUS_PATH
+static int get_is_charging(void) {
+	FILE *f;
+	char first_letter = '\0';
+
+	if (!(f = fopen("/sys/class/power_supply/BAT1/status", "r"))) {
+		perror("fopen");
+		exit(-1);
+	}
+	fread(&first_letter, 1, 1, f);
+	fclose(f);
+	return first_letter == 'C';
+}
 
 void albatwid_draw(const char *text,
 				   const char *fg_color,
@@ -128,20 +135,24 @@ void albatwid_draw(const char *text,
 static void usage(const char *program_name) {
 	fprintf(stderr,
 			"Usage:\n"
-			"  %s -p 100 -t 1.5  to show 100%% for 1.5 sec,\n"
-			"  %s -v             for version information,\n"
-			"  %s                for default behavior\n"
+			"  %s                   to gather statistics and run\n"
+			"  %s -v                for version information,\n"
+			"  %s -c -p 100 -t 1.5  to show charging 100%% for 1.5 sec,\n"
+			"  %s -C -p 0 -t 3      to show not charging 0%% for 3 sec,\n"
 			,
-			program_name, program_name, program_name);
+			program_name, program_name, program_name, program_name);
 	exit(1);
 }
 
 int main(int argc, char *argv[]) {
 	char *percentage = NULL, to_fill[5] = {'\0', '\0', '\0', '\0', '\0'};
+	int is_charging = -1;
 	double timeout = 0.5;
 
 	for (int i = 1; i < argc; i++) {
 		if (!strcmp(argv[i], "-v")) {puts("albatpop-"VERSION); exit(0);}
+		else if (!strcmp(argv[i], "-c")) is_charging = 1;
+		else if (!strcmp(argv[i], "-C")) is_charging = 0;
 		else if (i + 1 == argc) usage(argv[0]);
 		else if (!strcmp(argv[i], "-p")) percentage = argv[++i];
 		else if (!strcmp(argv[i], "-t")) timeout = atof(argv[++i]);
@@ -151,6 +162,13 @@ int main(int argc, char *argv[]) {
 		get_percentage(to_fill);
 		percentage = to_fill;
 	}
-	albatwid_draw(percentage, "#afbcbf", "#000e17", "#004065", timeout);
+	if (is_charging == -1) {
+		is_charging = get_is_charging();
+	}
+	if (is_charging) {
+		albatwid_draw(percentage, "#379cf6", "#000e17", "#004065", timeout);
+	} else {
+		albatwid_draw(percentage, "#afbcbf", "#000e17", "#1a202b", timeout);
+	}
 	return 0;
 }
