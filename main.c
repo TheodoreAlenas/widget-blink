@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 #include <locale.h>
 
@@ -92,6 +93,8 @@ int main(int argc, char *argv[]) {
 	                    CopyFromParent, CopyFromParent, CopyFromParent,
 	                    CWOverrideRedirect | CWBackPixel | CWEventMask, &swa);
 	XSetClassHint(dpy, win, &ch);
+	XMapRaised(dpy, win);
+	usleep(1000000);
 
 	return 0;
 }
