@@ -30,23 +30,18 @@ static void die(const char *fmt, ...) {
 #define BAT_CAPACITY_PATH "/sys/class/power_supply/BAT1/capacity"
 #define BAT_STATUS_PATH "/sys/class/power_supply/BAT1/status"
 
-static void get_stats(char *percentage, int *is_charging) {
+static void get_percentage(char *percentage) {
 	FILE *f;
 
-	if (!percentage) {
-		if (!(f = fopen(BAT_CAPACITY_PATH, "r"))) {
-			perror("fopen");
-			exit(-1);
-		}
-		fclose(f);
+	if (!(f = fopen(BAT_CAPACITY_PATH, "r"))) {
+		perror("fopen");
+		exit(-1);
 	}
-	if (is_charging && *is_charging == -1) {
-		if (!(f = fopen(BAT_STATUS_PATH, "r"))) {
-			perror("fopen");
-			exit(-1);
-		}
-		fclose(f);
-	}
+	fread(percentage, 4, 1, f);
+	fclose(f);
+	for (; *percentage != '\0'; percentage++)
+		if (*percentage == '\n')
+			*percentage = '\0';
 }
 #undef BAT_CAPACITY_PATH
 #undef BAT_STATUS_PATH
@@ -142,8 +137,7 @@ static void usage(const char *program_name) {
 }
 
 int main(int argc, char *argv[]) {
-	char *percentage = "error";
-	int is_charging = -1;
+	char *percentage = NULL, to_fill[5] = {'\0', '\0', '\0', '\0', '\0'};
 	double timeout = 0.5;
 
 	for (int i = 1; i < argc; i++) {
@@ -153,8 +147,10 @@ int main(int argc, char *argv[]) {
 		else if (!strcmp(argv[i], "-t")) timeout = atof(argv[++i]);
 		else usage(argv[0]);
 	}
-	get_stats(percentage, &is_charging);
+	if (!percentage) {
+		get_percentage(to_fill);
+		percentage = to_fill;
+	}
 	albatwid_draw(percentage, "#afbcbf", "#000e17", "#004065", timeout);
-
 	return 0;
 }
