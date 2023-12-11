@@ -2,6 +2,16 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <locale.h>
+
+#include <X11/Xlib.h>
+#include <X11/Xatom.h>
+#include <X11/Xutil.h>
+#ifdef XINERAMA
+#include <X11/extensions/Xinerama.h>
+#endif
+#include <X11/Xft/Xft.h>
+
 int percentage = 101;
 double timeout = 0.5;
 
@@ -15,8 +25,6 @@ static void usage(const char *program_name) {
 			program_name, program_name, program_name);
 	exit(1);
 }
-
-
 
 int main(int argc, char *argv[]) {
 	for (int i = 1; i < argc; i++) {
@@ -33,5 +41,7 @@ int main(int argc, char *argv[]) {
 		else
 			usage(argv[0]);
 	}
+	if (!setlocale(LC_CTYPE, "") || !XSupportsLocale())
+		fputs("warning: no locale support\n", stderr);
 	return 0;
 }
