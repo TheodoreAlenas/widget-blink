@@ -7,13 +7,27 @@
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
 #include <X11/Xutil.h>
-#ifdef XINERAMA
-#include <X11/extensions/Xinerama.h>
-#endif
 #include <X11/Xft/Xft.h>
 
 int percentage = 101;
 double timeout = 0.5;
+
+void die(const char *fmt, ...) {
+	va_list ap;
+
+	va_start(ap, fmt);
+	vfprintf(stderr, fmt, ap);
+	va_end(ap);
+
+	if (fmt[0] && fmt[strlen(fmt)-1] == ':') {
+		fputc(' ', stderr);
+		perror(NULL);
+	} else {
+		fputc('\n', stderr);
+	}
+
+	exit(1);
+}
 
 static void usage(const char *program_name) {
 	fprintf(stderr,
@@ -27,6 +41,10 @@ static void usage(const char *program_name) {
 }
 
 int main(int argc, char *argv[]) {
+	int screen;
+	Display *dpy;
+	Window root;
+	XWindowAttributes wa;
 	for (int i = 1; i < argc; i++) {
 		if (!strcmp(argv[i], "-v")) {
 			puts("albatpop-"VERSION);
@@ -43,5 +61,12 @@ int main(int argc, char *argv[]) {
 	}
 	if (!setlocale(LC_CTYPE, "") || !XSupportsLocale())
 		fputs("warning: no locale support\n", stderr);
+	if (!(dpy = XOpenDisplay(NULL)))
+		die("cannot open display");
+	screen = DefaultScreen(dpy);
+	root = RootWindow(dpy, screen);
+	if (!XGetWindowAttributes(dpy, root, &wa))
+		die("could not get embedding window attributes: 0x%lx",
+		    root);
 	return 0;
 }
