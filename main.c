@@ -115,26 +115,17 @@ static void usage(const char *program_name) {
 }
 
 int main(int argc, char *argv[]) {
-	int percentage = 69;
+	char *percentage = "69";
 	double timeout = 0.5;
 
 	for (int i = 1; i < argc; i++) {
-		if (!strcmp(argv[i], "-v")) {
-			puts("albatpop-"VERSION);
-			exit(0);
-		}
-		else if (i + 1 == argc)  /* the next arguments take values */
-			usage(argv[0]);
-		else if (!strcmp(argv[i], "-p"))
-			percentage = atoi(argv[++i]);
-		else if (!strcmp(argv[i], "-t"))
-			timeout = atof(argv[++i]);
-		else
-			usage(argv[0]);
+		if (!strcmp(argv[i], "-v")) {puts("albatpop-"VERSION); exit(0);}
+		else if (i + 1 == argc) usage(argv[0]);
+		else if (!strcmp(argv[i], "-p")) percentage = argv[++i];
+		else if (!strcmp(argv[i], "-t")) timeout = atof(argv[++i]);
+		else usage(argv[0]);
 	}
-	char p_txt[] = "12345678901234567890";
-	sprintf(p_txt, "%d", percentage);
-	albatwid_draw(p_txt, "#afbcbf", "#000e17", "#004065", timeout);
+	albatwid_draw(percentage, "#afbcbf", "#000e17", "#004065", timeout);
 
 	return 0;
 }
