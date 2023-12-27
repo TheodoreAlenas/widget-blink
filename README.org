@@ -5,6 +5,7 @@
 X11 window to blink via a key binding,
 even on top of full screen windows,
 and not require a shift of the eyes.
+It's yellow if charging.
 
 [[./screenshot.png]]
 
