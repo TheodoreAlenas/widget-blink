@@ -175,8 +175,8 @@ int main(int argc, char *argv[]) {
 	if (only_below >= 0 && is_charging)
 		exit(0);
 	if (is_charging)
-		albatwid_draw(percentage, "#379cf6", "#000e17", "#004065", timeout);
+		albatwid_draw(percentage, "#cf9f7f", "#000e17", "#904f30", timeout);
 	else
-		albatwid_draw(percentage, "#afbcbf", "#000e17", "#1a202b", timeout);
+		albatwid_draw(percentage, "#379cf6", "#000e17", "#004065", timeout);
 	return 0;
 }

@@ -1,0 +1,83 @@
+* Alena's Battery Blink
+
+** About
+
+X11 window to blink via a key binding,
+even on top of full screen windows,
+and not require a shift of the eyes.
+
+[[./screenshot.png]]
+
+A battery alarm is also easy to make.
+Though coming up with this wasn't easy.
+
+#+begin_src sh
+  while sleep 5; do albatwid -o 30; done &
+#+end_src
+
+"wid" stands for "widget".
+That's what I called it before uploading it.
+
+** Usage
+
+#+begin_src sh
+  git clone https://github.com/TheodoreAlenas/battery-blink
+  cd battery-blink
+  make test
+  ./albatwid --help
+#+end_src
+
+Then tweaks to ~main.c~ and ~make test~ repeatedly, finally
+
+#+begin_src sh
+  cp albatwid ~/.local/bin
+#+end_src
+
+at least God bless it's that easy. Otherwise, you know,
+
+#+begin_src sh
+  sudo cp albatwid /usr/local/bin/
+#+end_src
+
+or look around in the ~/usr~ for some ~bin/~ that
+seems to be local by some definition of local.
+
+What I do is, I have this in my ~.xinitrc~
+
+#+begin_src sh
+  while sleep 5; do albatwid -o 50; done &
+#+end_src
+
+because I have this problem where the battery falls to zero
+suddenly when it gets somewhere below 50.
+
+And I've bound ~Super + F~ to call ~albatwid~.
+Actually, I'm on Dvorak so it's ~Super + U~. Oh yeah!
+
+** Inspiration
+
+I used to have a Python app that acted in a similar way,
+and it looked nice.
+It was the first all nighter that I ever pulled off,
+I remember those days I was under pressure
+and I didn't know how to control that,
+I'm sure it's an interesting story but I don't remember it.
+
+Over time it started to look nice,
+like a battery with rounded corners,
+and with a thunder symbol and
+with lines showing where's 25% 50% and 75%,
+it was nice and the code was nice too.
+
+But it couldn't overlay full screen windows.
+I didn't know how to fix that.
+
+So I thought to take DMenu, another open source project,
+and rip it apart to make this thing.
+
+Ripping it was too hard so I squiggled around in it's code
+and I tried copying minimal snippets and I pieced this
+project together. It actually only took one day.
+
+I don't know. I like it.
+
