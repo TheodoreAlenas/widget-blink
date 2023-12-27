@@ -137,10 +137,10 @@ static void usage(const char *program_name) {
 			"above full screen windows and status bars.\n"
 			"\n"
 			"ARGS:\n"
-			"  -v                for version information,\n"
-			"  -c -p 100 -t 1.5  to show charging 100%% for 1.5 sec,\n"
-			"  -C -p 0 -t 3      to show not charging 0%% for 3 sec,\n"
-			"  -o 30             only appear if it's below 30%%,\n"
+			"  -v                for version information\n"
+			"  -c -p 100 -t 1.5  to show charging 100%% for 1.5 sec\n"
+			"  -C -p 0 -t 3      to show not charging 0%% for 3 sec\n"
+			"  -o 30             only appear if discharging & <30%%\n"
 			,
 			program_name);
 	exit(1);
