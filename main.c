@@ -153,7 +153,7 @@ int main(int argc, char *argv[]) {
 
 	for (int i = 1; i < argc; i++) {
 		if (!strcmp(argv[i], "-v")) {
-			puts("albatpop-"ALBATWID_VERSION);
+			puts("albatwid-"ALBATWID_VERSION);
 			exit(0);
 		}
 		else if (!strcmp(argv[i], "-c")) is_charging = 1;
