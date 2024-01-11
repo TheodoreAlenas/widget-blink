@@ -56,8 +56,8 @@ void draw_balls_around(Display *dpy, Drawable *drawable, GC *gc,
 	XArc balls[12];
 
 	for (i = 0; i < n; i++) {
-		balls[i].x = xoff + radius * cos(2.0 * M_PI * i / n);
-		balls[i].y = yoff + radius * sin(2.0 * M_PI * i / n);
+		balls[i].x = xoff - width/2 + radius * cos(2.0 * M_PI * i / n);
+		balls[i].y = yoff - width/2 + radius * sin(2.0 * M_PI * i / n);
 		balls[i].width = width;
 		balls[i].height = width;
 		balls[i].angle1 = 0;
