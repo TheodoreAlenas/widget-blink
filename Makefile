@@ -8,7 +8,7 @@ CC = cc
 CFLAGS = $(STD_WARNS) $(INCS) $(CPPFLAGS)
 LDFLAGS = -L/usr/X11R6/lib -lX11 -lfontconfig -lXft
 
-albatwid: main.c
+albatwid: albatwid.c
 	$(CC) $(CFLAGS) -o $@ -DALBATWID_VERSION=\"$V\" $^ $(LDFLAGS)
 
 test: albatwid

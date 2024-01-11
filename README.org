@@ -7,7 +7,7 @@ even on top of full screen windows,
 and not require a shift of the eyes.
 It's yellow if charging.
 
-[[./screenshot.png]]
+[[./albatwid.png]]
 
 A battery alarm is also easy to make.
 Though coming up with this wasn't easy.
