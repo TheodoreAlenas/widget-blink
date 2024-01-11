@@ -60,22 +60,23 @@ Linux distribution to set it up.
 
 I used to have Python executables that acted similar,
 and they looked nicer in comparison.
+I included them in this repository, on second thought.
 When I made them, I pulled off my first all nighter
 which was scary in a way because I would think
 the clock is showing the wrong time, I wasn't used
 to being awake these times.
 
-The battery had rounded corners,
-and with a thunder symbol and
-lines showing where's 25% 50% and 75%,
-it was nice and the code was nice too.
+The battery had rounded corners
+a thunder symbol when charging and
+lines on 25% 50% and 75%.
 The clock was a single clock with black, white and
 red, and it would show an arc for how close
 the minutes pointer was to an upcoming task.
-I abandoned that feature because I barely ever used it.
 
-The problem is they couldn't overlay full screen windows.
-I didn't know how to fix that.
+The main problem with the python executables was that
+they couldn't overlay full screen windows,
+and generally their features weren't based off of
+evidence or experience on what I need.
 So I thought to take DMenu, another open source project,
 and rip it apart to make this thing.
 Ripping it was too hard so I squiggled around in it's code
