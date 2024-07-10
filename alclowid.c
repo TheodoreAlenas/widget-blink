@@ -66,10 +66,10 @@ void draw_balls_around(Display *dpy, Drawable *drawable, GC *gc,
 	XFillArcs(dpy, *drawable, *gc, balls, n);
 }
 
-void draw_hour_number(Display *dpy, Drawable *drawable, GC *gc,
-					  XftFont *xfont, XftColor fg, XftDraw *d,
-					  int number, float radius, float width,
-					  int xoff, int yoff) {
+void draw_hour_number(Display *dpy, XftFont *xfont, Drawable *drawable,
+                      GC *gc, XftColor fg, XftDraw *d,
+                      int number, float radius,
+                      int xoff, int yoff) {
 
 	char text[16];
 	XGlyphInfo ext;
@@ -83,33 +83,52 @@ void draw_hour_number(Display *dpy, Drawable *drawable, GC *gc,
 		radius * sin(M_PI / 6.0 * number - M_PI / 2.0);
 	XftDrawStringUtf8(d, &fg, xfont, x, y,
 					  (XftChar8 *)text, strlen(text));
+
 }
 
 typedef struct {
-	Display *dpy; Drawable *drawable; GC *gc;
-	XftFont *xfont; XftColor fg; XftColor bg_charged; XftDraw *d;
+	Display *dpy; int screen; Drawable *drawable; GC *gc;
+	XftColor fg; XftColor bg_charged; XftDraw *d;
 	float hour_angle; float minute_angle;
 	int hl_hour_1; int hl_hour_2;
 	int yoff;
+	int w;
 } AlDraw;
 
 void draw_clock(AlDraw *a, int xoff) {
 
+#define SOURCE_CODE_PRO_SIZE "Source Code Pro:size="
+	char font[32] = SOURCE_CODE_PRO_SIZE;
+	int l;
+	XftFont *xfont;
+	for (l = 0; font[l]; l++);
+	sprintf(font + l, "%d", 8 * a->w / 100);
+	printf("%s\n", font);
+	if (!(xfont = XftFontOpenName(a->dpy, a->screen, font)))
+		die("cannot load font\n");
+
 	XSetForeground(a->dpy, *(a->gc), a->fg.pixel);
 	draw_bar(a->dpy, a->drawable, a->gc, a->hour_angle,
-			 130, 20, xoff, a->yoff);
+	         25 * a->w / 100,
+	         5  * a->w / 100, xoff, a->yoff);
 	draw_bar(a->dpy, a->drawable, a->gc, a->minute_angle,
-			 200, 20, xoff, a->yoff);
+	         40 * a->w / 100,
+	         4  * a->w / 100, xoff, a->yoff);
 
 	XSetForeground(a->dpy, *a->gc, a->bg_charged.pixel);
 	draw_balls_around(a->dpy, a->drawable, a->gc,
-					  200, 20, xoff, a->yoff);
+	                  50 * a->w / 100,
+	                  5 * a->w / 100, xoff, a->yoff);
 
-	draw_hour_number(a->dpy, a->drawable, a->gc, a->xfont, a->fg, a->d,
-					 a->hl_hour_1, 260, 20, xoff, a->yoff);
-	draw_hour_number(a->dpy, a->drawable, a->gc, a->xfont, a->fg, a->d,
-					 a->hl_hour_2, 260, 20, xoff, a->yoff);
+	draw_hour_number(a->dpy, xfont, a->drawable,
+	                 a->gc, a->fg, a->d, a->hl_hour_1,
+	                 60 * a->w / 100, xoff, a->yoff);
+	draw_hour_number(a->dpy, xfont, a->drawable,
+	                 a->gc, a->fg, a->d, a->hl_hour_2,
+	                 60 * a->w / 100, xoff, a->yoff);
 
+	XftFontClose(a->dpy, xfont);
+	free(xfont);
 }
 
 void albatwid_draw(float hour_angle,
@@ -127,7 +146,6 @@ void albatwid_draw(float hour_angle,
 	XWindowAttributes wa;
 	Drawable drawable;
 	GC gc;
-	XftFont *xfont;
 	XftColor fg, bg, bg_charged;
 	XftDraw *d = NULL;
 	XSetWindowAttributes swa;
@@ -148,15 +166,13 @@ void albatwid_draw(float hour_angle,
 	drawable = XCreatePixmap(dpy, root, w, h, DefaultDepth(dpy, screen));
 	gc = XCreateGC(dpy, root, 0, NULL);
 	XSetLineAttributes(dpy, gc, 1, LineSolid, CapButt, JoinMiter);
-	if (!(xfont = XftFontOpenName(dpy, screen, "Source Code Pro:size=50")))
-		die("cannot load font\n");
 	if (!XftColorAllocName(dpy, DefaultVisual(dpy, screen),
 	                       DefaultColormap(dpy, screen),
-						   bg_color, &bg))
+	                       bg_color, &bg))
 		die("cannot allocate background color");
 	if (!XftColorAllocName(dpy, DefaultVisual(dpy, screen),
 	                       DefaultColormap(dpy, screen),
-						   charged_bg_color, &bg_charged))
+	                       charged_bg_color, &bg_charged))
 		die("cannot allocate background color");
 	if (!XftColorAllocName(dpy, DefaultVisual(dpy, screen),
 	                       DefaultColormap(dpy, screen),
@@ -166,19 +182,23 @@ void albatwid_draw(float hour_angle,
 	XFillRectangle(dpy, drawable, gc, 0, 0, w, h);
 
 	d = XftDrawCreate(dpy, drawable,
-					  DefaultVisual(dpy, screen),
-					  DefaultColormap(dpy, screen));
+	                  DefaultVisual(dpy, screen),
+	                  DefaultColormap(dpy, screen));
 
 #define ALD_R(x) aldraw.x = x
 #define ALD_P(x) aldraw.x = &x
-	ALD_R(dpy); ALD_P(drawable); ALD_P(gc); ALD_R(xfont); ALD_R(fg);
+	ALD_R(dpy); ALD_R(screen); ALD_P(drawable); ALD_P(gc); ALD_R(fg);
 	ALD_R(bg_charged); ALD_R(d); ALD_R(hour_angle); ALD_R(minute_angle);
 	ALD_R(hl_hour_1); ALD_R(hl_hour_2);
 	aldraw.yoff = h/2;
+	aldraw.w = 60 * h / 100;
 
+	/*
 	draw_clock(&aldraw, 1*w/6);
 	draw_clock(&aldraw, 3*w/6);
 	draw_clock(&aldraw, 5*w/6);
+	*/
+	draw_clock(&aldraw, w/2);
 
 	swa.override_redirect = True;
 	swa.background_pixel = bg.pixel;
@@ -192,9 +212,6 @@ void albatwid_draw(float hour_angle,
 	XSync(dpy, False);
 
 	usleep(1000000L * timeout_seconds);
-
-	XftFontClose(dpy, xfont);
-	free(xfont);
 }
 
 static void usage(const char *program_name) {
