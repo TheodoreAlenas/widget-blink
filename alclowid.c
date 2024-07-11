@@ -82,7 +82,7 @@ void draw_hour_number(Display *dpy, XftFont *xfont, Drawable *drawable,
 	y = yoff + (xfont->ascent + xfont->descent) / 2 +
 		radius * sin(M_PI / 6.0 * number - M_PI / 2.0);
 	XftDrawStringUtf8(d, &fg, xfont, x, y,
-					  (XftChar8 *)text, strlen(text));
+	                  (XftChar8 *)text, strlen(text));
 
 }
 
@@ -102,8 +102,7 @@ void draw_clock(AlDraw *a, int xoff) {
 	int l;
 	XftFont *xfont;
 	for (l = 0; font[l]; l++);
-	sprintf(font + l, "%d", 8 * a->w / 100);
-	printf("%s\n", font);
+	sprintf(font + l, "%d", 10 * a->w / 100);
 	if (!(xfont = XftFontOpenName(a->dpy, a->screen, font)))
 		die("cannot load font\n");
 
@@ -112,12 +111,12 @@ void draw_clock(AlDraw *a, int xoff) {
 	         25 * a->w / 100,
 	         5  * a->w / 100, xoff, a->yoff);
 	draw_bar(a->dpy, a->drawable, a->gc, a->minute_angle,
-	         40 * a->w / 100,
+	         39 * a->w / 100,
 	         4  * a->w / 100, xoff, a->yoff);
 
 	XSetForeground(a->dpy, *a->gc, a->bg_charged.pixel);
 	draw_balls_around(a->dpy, a->drawable, a->gc,
-	                  50 * a->w / 100,
+	                  45 * a->w / 100,
 	                  5 * a->w / 100, xoff, a->yoff);
 
 	draw_hour_number(a->dpy, xfont, a->drawable,

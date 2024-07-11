@@ -69,6 +69,9 @@ void albatwid_draw(const char *text,
 	XGlyphInfo ext;
 	XSetWindowAttributes swa;
 	XClassHint ch = {"dmenu", "dmenu"};
+#define SOURCE_CODE_PRO_SIZE "Source Code Pro:size="
+	char font[32] = SOURCE_CODE_PRO_SIZE;
+	int l;
 
 	charged_percent = atoi(text);
 
@@ -86,7 +89,11 @@ void albatwid_draw(const char *text,
 	drawable = XCreatePixmap(dpy, root, w, h, DefaultDepth(dpy, screen));
 	gc = XCreateGC(dpy, root, 0, NULL);
 	XSetLineAttributes(dpy, gc, 1, LineSolid, CapButt, JoinMiter);
-	if (!(xfont = XftFontOpenName(dpy, screen, "Source Code Pro:size=300")))
+
+	for (l = 0; font[l]; l++);
+	sprintf(font + l, "%d", 30 * h / 100);
+
+	if (!(xfont = XftFontOpenName(dpy, screen, font)))
 		die("cannot load font\n");
 	if (!XftColorAllocName(dpy, DefaultVisual(dpy, screen),
 	                       DefaultColormap(dpy, screen),
