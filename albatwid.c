@@ -91,7 +91,7 @@ void albatwid_draw(const char *text,
 	XSetLineAttributes(dpy, gc, 1, LineSolid, CapButt, JoinMiter);
 
 	for (l = 0; font[l]; l++);
-	sprintf(font + l, "%d", 30 * h / 100);
+	sprintf(font + l, "%d", 40 * h / 100);
 
 	if (!(xfont = XftFontOpenName(dpy, screen, font)))
 		die("cannot load font\n");
